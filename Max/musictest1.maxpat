@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 803.0, 84.0, 699.0, 705.0 ],
+		"rect" : [ 34.0, 77.0, 1468.0, 713.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -70,7 +70,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 8.0, 322.45454740524292, 50.0, 22.0 ],
-					"text" : "21"
+					"text" : "94"
 				}
 
 			}
@@ -150,7 +150,6 @@
 				"box" : 				{
 					"fontname" : "Arial Bold",
 					"fontsize" : 10.0,
-					"format" : 4,
 					"id" : "obj-30",
 					"maxclass" : "number",
 					"numinlets" : 1,
@@ -158,7 +157,7 @@
 					"outlettype" : [ "", "bang" ],
 					"parameter_enable" : 0,
 					"patching_rect" : [ 189.0, 187.0, 40.0, 20.0 ],
-					"prototypename" : "Live-MIDI",
+					"prototypename" : "Live",
 					"triscale" : 0.75
 				}
 
@@ -173,7 +172,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 552.416625999999951, 680.0, 140.770111000000014, 23.0 ],
-					"text" : "midievent 144 21 0"
+					"text" : "midievent 144 94 0"
 				}
 
 			}
@@ -217,7 +216,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 277.416626000000008, 715.0, 76.333343999999997, 23.0 ],
-					"text" : "144 21 0"
+					"text" : "144 94 0"
 				}
 
 			}
