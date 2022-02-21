@@ -40,7 +40,7 @@ class MyOVBox(OVBox):
                     chunk = OVSignalBuffer(
                         chunk.startTime, chunk.endTime, numpyBuffer.tolist())
                     # self.output[0].append(chunk)
-                    client.send_message("filter", chunk)
+                    client.send_message("electrode", chunk)
                     # print(chunk)
 
                 elif(type(self.input[0][chunkIdx]) == OVSignalEnd):
