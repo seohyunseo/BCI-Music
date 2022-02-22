@@ -1,10 +1,11 @@
 '''
-title: sound model test 2
+title: sound model test 3
 data: meditation / electrode
-controlled component: duration  
-description: the duration of a note will be increased when meditation is high and decreased when vice versa. range is from 16 to 2
+controlled component: duration of the note / note 
+description: the duration of a note will be increased when meditation is high and decreased when vice versa. The range is from 16 to 2. 
+And the raw data will decide the note in certain scale which is made by harmony rule.
 openvibe server settings: check 'Esence' in 'Driver properties' / downsampling 512 -> 128
-resource: soundModel2.maxpat / soundModel2.xml
+resource: soundModel3.maxpat / soundModel3.xml
 '''
 import numpy as np
 import argparse
@@ -17,6 +18,7 @@ global epoch
 global meditation
 global electrode
 global duration
+global noteNum
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -44,6 +46,7 @@ class MyOVBox(OVBox):
         epoch = 8
         electrode = 0
         meditation = 2
+        noteNum = 6
         duration = 0.0
 
         for chunkIdx in range(len(self.input[0])):
@@ -59,7 +62,7 @@ class MyOVBox(OVBox):
                 chunk = self.input[0].pop()
 
                 list_chunked = list_chunk(chunk, epoch)
-                note = np.mean(list_chunked[electrode])
+                note = int(abs(np.mean(list_chunked[electrode])) % noteNum)
                 medi = np.mean(list_chunked[meditation])
 
                 # duration setting with meditation
@@ -73,7 +76,7 @@ class MyOVBox(OVBox):
                     duration = 0.5  # 2nd note
 
                 client.send_message("duration", duration)
-                client.send_message("electrode", note)
+                client.send_message("note", note)
 
             elif(type(self.input[0][chunkIdx]) == OVSignalEnd):
                 print(self.input[0].pop())
