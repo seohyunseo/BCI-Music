@@ -40,12 +40,24 @@
 		"assistshowspatchername" : 0,
 		"boxes" : [ 			{
 				"box" : 				{
+					"id" : "obj-62",
+					"linecount" : 2,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 433.0, 31.0, 150.0, 36.0 ],
+					"text" : "두 데이터를 한번에 송수신 할 순 없을까"
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"id" : "obj-58",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "int" ],
-					"patching_rect" : [ 464.0, 119.0, 29.5, 22.0 ],
+					"patching_rect" : [ 433.0, 144.0, 29.5, 22.0 ],
 					"text" : "* 2"
 				}
 
@@ -59,7 +71,7 @@
 					"numoutlets" : 2,
 					"outlettype" : [ "", "bang" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 371.5, 187.0, 50.0, 22.0 ]
+					"patching_rect" : [ 297.5, 25.0, 50.0, 22.0 ]
 				}
 
 			}
@@ -72,7 +84,7 @@
 					"numoutlets" : 2,
 					"outlettype" : [ "", "bang" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 464.0, 158.0, 50.0, 22.0 ]
+					"patching_rect" : [ 471.0, 144.0, 50.0, 22.0 ]
 				}
 
 			}
@@ -83,7 +95,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "int" ],
-					"patching_rect" : [ 354.333312999999976, 103.633993297815323, 39.0, 22.0 ],
+					"patching_rect" : [ 360.520008098876872, 25.0, 39.0, 22.0 ],
 					"text" : "+ 300"
 				}
 
@@ -108,7 +120,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 2,
 					"outlettype" : [ "", "" ],
-					"patching_rect" : [ 552.416625999999951, 81.0, 89.0, 22.0 ],
+					"patching_rect" : [ 327.333344000000011, 109.0, 89.0, 22.0 ],
 					"text" : "route electrode"
 				}
 
@@ -120,7 +132,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 2,
 					"outlettype" : [ "", "" ],
-					"patching_rect" : [ 432.0, 74.0, 95.0, 22.0 ],
+					"patching_rect" : [ 433.0, 109.0, 95.0, 22.0 ],
 					"text" : "route meditation"
 				}
 
@@ -132,7 +144,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 432.0, 37.0, 97.0, 22.0 ],
+					"patching_rect" : [ 433.0, 72.0, 97.0, 22.0 ],
 					"text" : "udpreceive 7402"
 				}
 
@@ -145,7 +157,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 8.0, 322.45454740524292, 50.0, 22.0 ],
-					"text" : "-784"
+					"text" : "-681"
 				}
 
 			}
@@ -247,23 +259,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 552.416625999999951, 680.0, 140.770111000000014, 23.0 ],
-					"text" : "midievent 144 112 0"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"border" : 0,
-					"filename" : "helpargs.js",
-					"id" : "obj-21",
-					"ignoreclick" : 1,
-					"jsarguments" : [ "midiformat" ],
-					"maxclass" : "jsui",
-					"numinlets" : 1,
-					"numoutlets" : 1,
-					"outlettype" : [ "" ],
-					"parameter_enable" : 0,
-					"patching_rect" : [ 406.0, 620.0, 287.16400146484375, 39.0 ]
+					"text" : "midievent 144 87 0"
 				}
 
 			}
@@ -291,21 +287,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 277.416626000000008, 715.0, 76.333343999999997, 23.0 ],
-					"text" : "144 112 0"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"bubble" : 1,
-					"fontname" : "Arial",
-					"fontsize" : 13.0,
-					"id" : "obj-16",
-					"maxclass" : "comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 427.0, 591.0, 76.0, 25.0 ],
-					"text" : "Channel"
+					"text" : "144 87 0"
 				}
 
 			}
@@ -319,21 +301,6 @@
 					"outlettype" : [ "int", "", "" ],
 					"parameter_enable" : 0,
 					"patching_rect" : [ 371.5, 592.0, 50.0, 22.0 ]
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"bubble" : 1,
-					"fontname" : "Arial",
-					"fontsize" : 13.0,
-					"id" : "obj-13",
-					"linecount" : 2,
-					"maxclass" : "comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 84.166656000000003, 741.0, 170.0, 40.0 ],
-					"text" : "Output of midiformat typically goes to midiout."
 				}
 
 			}
@@ -374,104 +341,6 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 50.0, 669.0, 152.0, 23.0 ],
 					"text" : "print midibyte @popup 1"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"bubble" : 1,
-					"fontname" : "Arial",
-					"fontsize" : 13.0,
-					"id" : "obj-8",
-					"maxclass" : "comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 361.833344000000011, 565.0, 89.0, 25.0 ],
-					"text" : "Pitch Bend"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"bubble" : 1,
-					"fontname" : "Arial",
-					"fontsize" : 13.0,
-					"id" : "obj-7",
-					"maxclass" : "comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 304.833312999999976, 536.0, 138.0, 25.0 ],
-					"text" : "Channel Aftertouch"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"bubble" : 1,
-					"fontname" : "Arial",
-					"fontsize" : 13.0,
-					"id" : "obj-6",
-					"maxclass" : "comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 242.416626000000008, 506.0, 127.0, 25.0 ],
-					"text" : "Program Change"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"bubble" : 1,
-					"fontname" : "Arial",
-					"fontsize" : 13.0,
-					"id" : "obj-5",
-					"maxclass" : "comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 194.999985000000009, 467.463684000000001, 228.0, 25.0 ],
-					"text" : "Control Change <controller, value>"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"bubble" : 1,
-					"fontname" : "Arial",
-					"fontsize" : 13.0,
-					"id" : "obj-4",
-					"maxclass" : "comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 130.999984999999981, 420.963684000000001, 292.0, 25.0 ],
-					"text" : "Polyphonic (Key) Aftertouch <pitch, pressure>"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"bubble" : 1,
-					"fontname" : "Arial",
-					"fontsize" : 13.0,
-					"id" : "obj-3",
-					"maxclass" : "comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 84.166656000000003, 393.463684000000001, 76.0, 25.0 ],
-					"text" : "Note Off"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"bubble" : 1,
-					"fontname" : "Arial",
-					"fontsize" : 13.0,
-					"id" : "obj-2",
-					"maxclass" : "comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 79.333327999999995, 364.0, 76.0, 25.0 ],
-					"text" : "Note On"
 				}
 
 			}
@@ -587,53 +456,11 @@
 				}
 
 			}
-, 			{
-				"box" : 				{
-					"background" : 1,
-					"bgcolor" : [ 1.0, 0.788235, 0.470588, 1.0 ],
-					"fontface" : 1,
-					"hint" : "",
-					"id" : "obj-19",
-					"ignoreclick" : 1,
-					"legacytextcolor" : 1,
-					"maxclass" : "textbutton",
-					"numinlets" : 1,
-					"numoutlets" : 3,
-					"outlettype" : [ "", "", "int" ],
-					"parameter_enable" : 0,
-					"patching_rect" : [ 426.0, 469.963684000000001, 20.0, 20.0 ],
-					"rounded" : 60.0,
-					"text" : "2",
-					"textcolor" : [ 0.34902, 0.34902, 0.34902, 1.0 ]
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"background" : 1,
-					"bgcolor" : [ 1.0, 0.788235, 0.470588, 1.0 ],
-					"fontface" : 1,
-					"hint" : "",
-					"id" : "obj-93",
-					"ignoreclick" : 1,
-					"legacytextcolor" : 1,
-					"maxclass" : "textbutton",
-					"numinlets" : 1,
-					"numoutlets" : 3,
-					"outlettype" : [ "", "", "int" ],
-					"parameter_enable" : 0,
-					"patching_rect" : [ 161.499985000000009, 377.963684000000001, 20.0, 20.0 ],
-					"rounded" : 60.0,
-					"text" : "1",
-					"textcolor" : [ 0.34902, 0.34902, 0.34902, 1.0 ]
-				}
-
-			}
  ],
 		"lines" : [ 			{
 				"patchline" : 				{
 					"destination" : [ "obj-12", 0 ],
-					"order" : 1,
+					"order" : 0,
 					"source" : [ "obj-1", 0 ]
 				}
 
@@ -641,7 +468,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-25", 0 ],
-					"order" : 0,
+					"order" : 1,
 					"source" : [ "obj-1", 0 ]
 				}
 
@@ -816,7 +643,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-41", 1 ],
-					"order" : 1,
+					"order" : 0,
 					"source" : [ "obj-51", 0 ]
 				}
 
@@ -824,7 +651,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-57", 0 ],
-					"order" : 0,
+					"order" : 1,
 					"source" : [ "obj-51", 0 ]
 				}
 
@@ -867,13 +694,7 @@
 
 			}
  ],
-		"dependency_cache" : [ 			{
-				"name" : "helpargs.js",
-				"bootpath" : "C74:/help/resources",
-				"type" : "TEXT",
-				"implicit" : 1
-			}
- ],
+		"dependency_cache" : [  ],
 		"autosave" : 0
 	}
 

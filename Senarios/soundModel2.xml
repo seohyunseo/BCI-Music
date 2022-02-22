@@ -92,11 +92,11 @@
 			<Attributes>
 				<Attribute>
 					<Identifier>(0x1fa7a38f, 0x54edbe0b)</Identifier>
-					<Value>320</Value>
+					<Value>352</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x207c9054, 0x3c841b63)</Identifier>
-					<Value>240</Value>
+					<Value>336</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x4e7b798a, 0x183beafb)</Identifier>
@@ -161,11 +161,11 @@
 			<Attributes>
 				<Attribute>
 					<Identifier>(0x1fa7a38f, 0x54edbe0b)</Identifier>
-					<Value>128</Value>
+					<Value>160</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x207c9054, 0x3c841b63)</Identifier>
-					<Value>368</Value>
+					<Value>464</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x4e7b798a, 0x183beafb)</Identifier>
@@ -237,11 +237,11 @@
 			<Attributes>
 				<Attribute>
 					<Identifier>(0x1fa7a38f, 0x54edbe0b)</Identifier>
-					<Value>224</Value>
+					<Value>256</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x207c9054, 0x3c841b63)</Identifier>
-					<Value>352</Value>
+					<Value>448</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x4e7b798a, 0x183beafb)</Identifier>
@@ -288,7 +288,7 @@
 					<TypeIdentifier>(0xb0d0db45, 0x49cbc34a)</TypeIdentifier>
 					<Name>Script</Name>
 					<DefaultValue></DefaultValue>
-					<Value>C:/Users/seohyunseo/Desktop/BCIMusic/Scripts/soundModel1.py</Value>
+					<Value>C:/Users/seohyunseo/Desktop/BCIMusic/Scripts/soundModel2.py</Value>
 					<Modifiability>false</Modifiability>
 				</Setting>
 			</Settings>
@@ -299,11 +299,11 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x1fa7a38f, 0x54edbe0b)</Identifier>
-					<Value>320</Value>
+					<Value>352</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x207c9054, 0x3c841b63)</Identifier>
-					<Value>352</Value>
+					<Value>448</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x30a4e5c9, 0x83502953)</Identifier>
@@ -374,9 +374,9 @@
 	<Comments></Comments>
 	<Metadata>
 		<Entry>
-			<Identifier>(0x0000643a, 0x00003a65)</Identifier>
+			<Identifier>(0x00001d00, 0x00002e47)</Identifier>
 			<Type>(0x3bcce5d2, 0x43f2d968)</Type>
-			<Data>[{"boxIdentifier":"(0xffffffff, 0xffffffff)","childCount":1,"height":320,"identifier":"(0x000033c8, 0x00000035)","name":"Default window","parentIdentifier":"(0xffffffff, 0xffffffff)","type":1,"width":480},{"boxIdentifier":"(0x000008fa, 0x00000487)","childCount":0,"identifier":"(0x000068a6, 0x00000bea)","parentIdentifier":"(0xffffffff, 0xffffffff)","type":3},{"boxIdentifier":"(0xffffffff, 0xffffffff)","childCount":1,"identifier":"(0x000012f6, 0x00000014)","index":0,"name":"Default tab","parentIdentifier":"(0x000033c8, 0x00000035)","type":2},{"boxIdentifier":"(0xffffffff, 0xffffffff)","childCount":0,"identifier":"(0x00006045, 0x00004202)","index":0,"name":"Empty","parentIdentifier":"(0x000012f6, 0x00000014)","type":0}]</Data>
+			<Data>[{"boxIdentifier":"(0x000008fa, 0x00000487)","childCount":0,"identifier":"(0x000035cf, 0x000059fa)","parentIdentifier":"(0xffffffff, 0xffffffff)","type":3},{"boxIdentifier":"(0xffffffff, 0xffffffff)","childCount":1,"height":320,"identifier":"(0x000065fc, 0x00007bf6)","name":"Default window","parentIdentifier":"(0xffffffff, 0xffffffff)","type":1,"width":480},{"boxIdentifier":"(0xffffffff, 0xffffffff)","childCount":1,"identifier":"(0x00005b30, 0x00005d3a)","index":0,"name":"Default tab","parentIdentifier":"(0x000065fc, 0x00007bf6)","type":2},{"boxIdentifier":"(0xffffffff, 0xffffffff)","childCount":0,"identifier":"(0x00002e60, 0x000051dd)","index":0,"name":"Empty","parentIdentifier":"(0x00005b30, 0x00005d3a)","type":0}]</Data>
 		</Entry>
 	</Metadata>
 </OpenViBE-Scenario>

@@ -1,10 +1,10 @@
 '''
-title: sound model test 1
-data: meditation
-controlled component: tempo(metro) 
-description: the tempo of the music will be increased when meditation is low and decreased when vice versa.
+title: sound model test 2
+data: meditation / electrode
+controlled component: duration  
+description: the duration of a note will be increased when meditation is high and decreased when vice versa. range is from 16 to 2
 openvibe server settings: check 'Esence' in 'Driver properties' / downsampling 512 -> 128
-resource: soundModel1.maxpat / soundModel1.xml
+resource: soundModel2.maxpat / soundModel2.xml
 '''
 import numpy as np
 import argparse
@@ -16,6 +16,7 @@ from pythonosc import udp_client
 global epoch
 global meditation
 global electrode
+global duration
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -43,6 +44,7 @@ class MyOVBox(OVBox):
         epoch = 8
         electrode = 0
         meditation = 2
+        duration = 0.0
 
         for chunkIdx in range(len(self.input[0])):
             if(type(self.input[0][chunkIdx]) == OVSignalHeader):
@@ -58,13 +60,21 @@ class MyOVBox(OVBox):
                 chunk = self.input[0].pop()
 
                 list_chunked = list_chunk(chunk, epoch)
-                # print(list_chunked[meditation])
                 note = np.mean(list_chunked[electrode])
-                tempo = np.mean(list_chunked[meditation])
-                client.send_message("meditation", tempo)
+                medi = np.mean(list_chunked[meditation])
+
+                # duration setting with meditation
+                if(0 < medi and medi <= 25):
+                    duration = 0.0625  # 16th note
+                elif(25 < medi and medi <= 50):
+                    duration = 0.125  # 8th note
+                elif(50 < medi and medi <= 75):
+                    duration = 0.25  # 4th note
+                elif(75 < medi and medi <= 100):
+                    duration = 0.5  # 2nd note
+
+                client.send_message("duration", duration)
                 client.send_message("electrode", note)
-                # print(list_chunked[electrode])
-                # avg = np.mean(list_chunked[meditation])
 
             elif(type(self.input[0][chunkIdx]) == OVSignalEnd):
                 print(self.input[0].pop())
