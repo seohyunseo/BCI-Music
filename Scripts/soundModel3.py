@@ -57,6 +57,7 @@ class MyOVBox(OVBox):
                                               'Mean']+self.signalHeader.dimensionSizes[1]*[''], self.signalHeader.samplingRate)
 
                 print(outputHeader)
+                client.send_message("bang", "bang")
 
             elif(type(self.input[0][chunkIdx]) == OVSignalBuffer):
                 chunk = self.input[0].pop()
@@ -80,6 +81,7 @@ class MyOVBox(OVBox):
 
             elif(type(self.input[0][chunkIdx]) == OVSignalEnd):
                 print(self.input[0].pop())
+                client.send_message("bang", "bang")
 
 
 box = MyOVBox()
