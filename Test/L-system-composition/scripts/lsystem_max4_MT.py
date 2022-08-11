@@ -23,10 +23,7 @@ notes = [36, 38, 40, 43, 45, 48, 50, 52, 55, 57, 60, 62, 64, 67, 69, 72, 74, 76,
 
 
 def bang_handler(unused_addr, args, volume):
-    # client.send_message("test", 100)
     args[0].value = 1
-    # print("bang")
-    # print("bang: ", args[0].value)
 
 
 def server_func(toggle):
@@ -70,20 +67,30 @@ def draw_l_system(turtle, SYSTEM_RULES, seg_length, angle, toggle, client):
     message = []
     duration = 16
     currentPitch = 15
+    velocity = 127
     i = 0
+
+    client.send_message("bang", 'bang')
     for command in SYSTEM_RULES:
         turtle.pd()
         if command in ["F", "G", "R", "L"]:
             while toggle.value == 0:
                 continue
             toggle.value = 0
+            # print("command[", i, "]: "+SYSTEM_RULES[i] +
+            #       ", command[", i+1, "]: " + SYSTEM_RULES[i+1])
             if (SYSTEM_RULES[i+1] is not SYSTEM_RULES[-1]) and (SYSTEM_RULES[i+1] is not 'F'):
-                message = [notes[currentPitch], duration]
-                client.send_message("message", message)
-                duration = 16
+                velocity = 127
+                # print("note on(", duration, ", ", velocity, ")")
+            elif SYSTEM_RULES[i+1] is 'F':
+                velocity = 0
+                # print("note off(", duration, ", ", velocity, ")")
             else:
-                if duration >= 2:
-                    duration /= 2
+                sys.exit(0)
+
+            message = [notes[currentPitch], duration, velocity]
+            client.send_message("message", message)
+
             turtle.forward(seg_length)
 
         elif command == "f":
@@ -126,7 +133,7 @@ def drawing_macro(toggle, client):
     iterations = 3
     model = derivation(axiom, iterations)
 
-    segment_length = 5
+    segment_length = 10
     alpha_zero = 90.0
     angle = 90.0
 
@@ -151,20 +158,14 @@ def main(toggle):
     client = udp_client.SimpleUDPClient(args.ip, args.port)
 
     drawing_macro(toggle, client)
-    # for i in range(0, 100):
-    #     print("[", i, "]: ", toggle.value)
-    #     if toggle.value == 100:
-    #         client.send_message("test", 100)
-    #         toggle.value = 0
-    #     else:
-    #         client.send_message("test", i)
-    #     time.sleep(1)
-    #     i += 1
 
 
 if __name__ == "__main__":
-    toggle = Value('i', 0)
-    p = Process(target=server_func, args=(toggle,))
-    c = Process(target=main, args=(toggle,))
-    p.start()
-    c.start()
+    try:
+        toggle = Value('i', 0)
+        p = Process(target=server_func, args=(toggle,))
+        c = Process(target=main, args=(toggle,))
+        p.start()
+        c.start()
+    except BaseException:
+        sys.exit(0)
