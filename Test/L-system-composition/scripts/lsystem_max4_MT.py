@@ -20,9 +20,9 @@ SYSTEM_RULES = {}  # generator system rules for l-system
 
 notes = [36, 38, 40, 43, 45, 48, 50, 52, 55, 57, 60, 62, 64, 67, 69, 72, 74, 76,
          79, 81, 84, 86, 88, 91, 93, 96, 98, 100, 103, 105, 108, 110, 112, 115, 117]
-durations = [2, 4, 8, 16]
+durations = [2, 4, 8, 16, 32]
 
-velocities = [127, 97, 67]
+velocities = [0, 127, 97, 67]
 
 
 def bang_handler(unused_addr, args, volume):
@@ -67,21 +67,22 @@ def rule(sequence):
 
 def draw_l_system(turtle, model, seg_length, angle, toggle, client):
     stack = []
-    message = []
+    midiout = []
+    play = [1, 0, 0]
     currentDuration = 2
     currentPitch = 5
-    velocity = 127
-    play = [1, 0]
+    currentVelocity = 1
+    currentPlay = 0
+
     i = 0
 
     for idx in range(0, 3):
 
+        client.send_message("record"+str(idx+1), 1)
         client.send_message("play", play)
         print("Play loop:", idx)
 
         SYSTEM_RULES = model[idx][-1]
-        currentPitch += idx*10
-        currentDuration += idx
 
         for command in SYSTEM_RULES:
             turtle.pd()
@@ -93,23 +94,22 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
 
                 if i+1 == len(SYSTEM_RULES):
                     print("out of range")
-                    client.send_message("bang", 'bang')
-                    client.send_message("bang2", 'bang')
+                    client.send_message("mainplay", 'bang')
+                    client.send_message("loopset", 'bang')
                     time.sleep(1)
-                    play[1] = 1
                     break
 
                 elif SYSTEM_RULES[i+1] is not 'F':
-                    velocity = 127
+                    currentVelocity = idx+1
                     # print("note on(", duration, ", ", velocity, ")")
 
                 elif SYSTEM_RULES[i+1] is 'F':
-                    velocity = 0
+                    currentVelocity = 0
                     # print("note off(", duration, ", ", velocity, ")")
 
-                message = [notes[currentPitch],
-                           durations[currentDuration], velocity]
-                client.send_message("message", message)
+                midiout = [notes[currentPitch],
+                           durations[currentDuration], velocities[currentVelocity]]
+                client.send_message("midiout", midiout)
                 # print("command[", i, "]: "+SYSTEM_RULES[i] +
                 #       ", command[", i+1, "]: " + SYSTEM_RULES[i+1])
 
@@ -136,8 +136,16 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
                 turtle.goto(position)
                 turtle.setheading(heading)
 
-            print("command: ", i+1, "/", len(SYSTEM_RULES))
+            # print("command: ", i+1, "/", len(SYSTEM_RULES))
             i += 1
+
+        currentPitch += 10
+        currentDuration += 1
+        currentVelocity += 1
+        currentPlay += 1
+
+        play[currentPlay] = 1
+        client.send_message("record"+str(idx+1), 0)
         i = 0
     return
 
