@@ -2,6 +2,7 @@
 Test to send note and duration for controling the metro in Max/MSP
 This code use OSC Client and Server at the same code
 This code use Multithreading between Server and Client
+This code makes harmony
 '''
 import sys
 import turtle
@@ -20,9 +21,7 @@ SYSTEM_RULES = {}  # generator system rules for l-system
 
 notes = [36, 38, 40, 43, 45, 48, 50, 52, 55, 57, 60, 62, 64, 67, 69, 72, 74, 76,
          79, 81, 84, 86, 88, 91, 93, 96, 98, 100, 103, 105, 108, 110, 112, 115, 117]
-durations = [2, 4, 8, 16]
-
-velocities = [127, 97, 67]
+durations = [16, 8, 4, 2]
 
 
 def bang_handler(unused_addr, args, volume):
@@ -65,80 +64,66 @@ def rule(sequence):
     return sequence
 
 
-def draw_l_system(turtle, model, seg_length, angle, toggle, client):
+def draw_l_system(turtle, SYSTEM_RULES, seg_length, angle, toggle, client):
     stack = []
     message = []
-    currentDuration = 2
-    currentPitch = 5
+    currentDuration = 0
+    currentPitch = 15
     velocity = 127
-    play = [1, 0]
     i = 0
 
-    for idx in range(0, 3):
+    client.send_message("bang", 'bang')
+    for command in SYSTEM_RULES:
+        turtle.pd()
 
-        client.send_message("play", play)
-        print("Play loop:", idx)
+        # print("command[", i, "]: "+SYSTEM_RULES[i] +
+        #       ", command[", i+1, "]: " + SYSTEM_RULES[i+1]+" last command: ", len(SYSTEM_RULES))
 
-        SYSTEM_RULES = model[idx][-1]
-        currentPitch += idx*10
-        currentDuration += idx
+        if command in ["F", "G", "R", "L"]:
+            while toggle.value == 0:
+                continue
+            toggle.value = 0
 
-        for command in SYSTEM_RULES:
-            turtle.pd()
+            if i+1 is len(SYSTEM_RULES):
+                print("out of range")
+                client.send_message("bang", 'bang')
+                sys.exit(0)
 
-            if command in ["F", "G", "R", "L"]:
-                while toggle.value == 0:
-                    continue
-                toggle.value = 0
+            elif SYSTEM_RULES[i+1] is not 'F':
+                velocity = 127
+                # print("note on(", duration, ", ", velocity, ")")
 
-                if i+1 == len(SYSTEM_RULES):
-                    print("out of range")
-                    client.send_message("bang", 'bang')
-                    client.send_message("bang2", 'bang')
-                    time.sleep(1)
-                    play[1] = 1
-                    break
+            elif SYSTEM_RULES[i+1] is 'F':
+                velocity = 0
+                # print("note off(", duration, ", ", velocity, ")")
 
-                elif SYSTEM_RULES[i+1] is not 'F':
-                    velocity = 127
-                    # print("note on(", duration, ", ", velocity, ")")
+            message = [notes[currentPitch],
+                       durations[currentDuration], velocity]
+            client.send_message("message", message)
 
-                elif SYSTEM_RULES[i+1] is 'F':
-                    velocity = 0
-                    # print("note off(", duration, ", ", velocity, ")")
+            turtle.forward(seg_length)
 
-                message = [notes[currentPitch],
-                           durations[currentDuration], velocity]
-                client.send_message("message", message)
-                # print("command[", i, "]: "+SYSTEM_RULES[i] +
-                #       ", command[", i+1, "]: " + SYSTEM_RULES[i+1])
-
-                turtle.forward(seg_length)
-
-            elif command == "f":
-                turtle.pu()  # pen up - not drawing
-                turtle.forward(seg_length)
-            elif command == "+":
-                turtle.right(angle)
-                # max
-                currentPitch += 1
-                # max
-            elif command == "-":
-                turtle.left(angle)
-                # max
-                currentPitch -= 1
-                # max
-            elif command == "[":
-                stack.append((turtle.position(), turtle.heading()))
-            elif command == "]":
-                turtle.pu()  # pen up - not drawing
-                position, heading = stack.pop()
-                turtle.goto(position)
-                turtle.setheading(heading)
-
-            print("command: ", i+1, "/", len(SYSTEM_RULES))
-            i += 1
-        i = 0
+        elif command == "f":
+            turtle.pu()  # pen up - not drawing
+            turtle.forward(seg_length)
+        elif command == "+":
+            turtle.right(angle)
+            # max
+            currentPitch += 1
+            # max
+        elif command == "-":
+            turtle.left(angle)
+            # max
+            currentPitch -= 1
+            # max
+        elif command == "[":
+            stack.append((turtle.position(), turtle.heading()))
+        elif command == "]":
+            turtle.pu()  # pen up - not drawing
+            position, heading = stack.pop()
+            turtle.goto(position)
+            turtle.setheading(heading)
+        i += 1
     return
 
 
@@ -156,11 +141,8 @@ def drawing_macro(toggle, client):
     SYSTEM_RULES[key] = value
 
     axiom = "F-F-F-F"
-    model = []
-    for i in range(0, 3):
-        # iterations = 1
-        model.append(derivation(axiom, i+1))
-    # print(model)
+    iterations = 3
+    model = derivation(axiom, iterations)
 
     segment_length = 5
     alpha_zero = 90.0
@@ -170,7 +152,7 @@ def drawing_macro(toggle, client):
     r_turtle = set_turtle(alpha_zero)  # create turtle object
     turtle_screen = turtle.Screen()  # create graphics window
     turtle_screen.screensize(1500, 1500)
-    draw_l_system(r_turtle, model,
+    draw_l_system(r_turtle, model[-1],
                   segment_length, angle, toggle, client)  # draw model
     client.send_message("bang", 'bang')
     turtle_screen.exitonclick()
