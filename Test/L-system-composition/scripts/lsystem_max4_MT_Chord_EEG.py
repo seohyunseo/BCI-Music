@@ -2,6 +2,7 @@
 Test to send note and duration for controling the metro in Max/MSP
 This code use OSC Client and Server at the same code
 This code use Multithreading between Server and Client
+This code use EEG information for controling the music parameters
 '''
 import sys
 import turtle
@@ -32,7 +33,12 @@ def bang_handler(unused_addr, args, volume):
     args[0].value = 1
 
 
-def server_func(toggle):
+def eeg_handler(unused_addr, args, eeg):
+    args[0].value = eeg
+    print("Alpha Ratio: ", args[0].value)
+
+
+def server_func(toggle, eeg):
     # OSC Server Setting
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip",
@@ -45,6 +51,7 @@ def server_func(toggle):
     global dispatcher
     dispatcher = dispatcher.Dispatcher()
     dispatcher.map("/filter", bang_handler, toggle)
+    dispatcher.map("/eeg", eeg_handler, eeg)
 
     server = osc_server.ThreadingOSCUDPServer(
         (args.ip, args.port), dispatcher)
@@ -204,7 +211,8 @@ def main(toggle):
 if __name__ == "__main__":
     try:
         toggle = Value('i', 0)
-        p = Process(target=server_func, args=(toggle,))
+        eeg = Value('d', 0.0)
+        p = Process(target=server_func, args=(toggle, eeg,))
         c = Process(target=main, args=(toggle,))
         p.start()
         c.start()
