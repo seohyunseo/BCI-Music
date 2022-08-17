@@ -1,8 +1,8 @@
 '''
 title: sound model test 3
 data: meditation / electrode
-controlled component: duration of the note / note 
-description: the duration of a note will be increased when meditation is high and decreased when vice versa. The range is from 16 to 2. 
+controlled component: duration of the note / note
+description: the duration of a note will be increased when meditation is high and decreased when vice versa. The range is from 16 to 2.
 And the raw data will decide the note in certain scale which is made by harmony rule.
 openvibe server settings: check 'Esence' in 'Driver properties' / downsampling 512 -> 128
 resource: soundModel3.maxpat / soundModel3.xml
@@ -39,47 +39,52 @@ class MyOVBox(OVBox):
     def __init__(self):
         OVBox.__init__(self)
         self.signalHeader = None
+        self.sum = 0
 
     def process(self):
-
         # initialize variables
         epoch = 8
         electrode = 0
         meditation = 2
         noteNum = 6
-        duration = 0.0
+        chord_pro = 0
 
         for chunkIdx in range(len(self.input[0])):
-            if(type(self.input[0][chunkIdx]) == OVSignalHeader):
+            if (type(self.input[0][chunkIdx]) == OVSignalHeader):
                 self.signalHeader = self.input[0].pop()
 
                 outputHeader = OVSignalHeader(self.signalHeader.startTime, self.signalHeader.endTime, [1, self.signalHeader.dimensionSizes[1]], [
                                               'Mean']+self.signalHeader.dimensionSizes[1]*[''], self.signalHeader.samplingRate)
 
                 print(outputHeader)
-
             elif(type(self.input[0][chunkIdx]) == OVSignalBuffer):
                 chunk = self.input[0].pop()
 
                 list_chunked = list_chunk(chunk, epoch)
-                note = int(abs(np.mean(list_chunked[electrode])) % noteNum)
-                medi = np.mean(list_chunked[meditation])
-
-                # duration setting with meditation
-                if(0 < medi and medi <= 25):
-                    duration = 0.0625  # 16th note
-                elif(25 < medi and medi <= 50):
-                    duration = 0.125  # 8th note
-                elif(50 < medi and medi <= 75):
-                    duration = 0.25  # 4th note
-                elif(75 < medi and medi <= 100):
-                    duration = 0.5  # 2nd note
-
-                client.send_message("duration", duration)
-                client.send_message("note", note)
+                alpha_ratio = np.mean(list_chunked[electrode])
+                self.sum = self.sum + alpha_ratio
 
             elif(type(self.input[0][chunkIdx]) == OVSignalEnd):
                 print(self.input[0].pop())
+
+                ratio = self.sum/1000
+                print("ratio: ", ratio)
+                # dermine a chord progression among
+                if(ratio >= 75):
+                    chord_pro = 0
+                elif(ratio < 74 and ratio >= 50):
+                    chord_pro = 1
+                elif(ratio < 49 and ratio >= 25):
+                    chord_pro = 2
+                else:
+                    chord_pro = 3
+                client.send_message("chord_pro", chord_pro)
+                print("chord progression: ", chord_pro)
+
+                # dermine first note
+                f_note = int(ratio) % 7
+                client.send_message("first_note", f_note)
+                print("first note: ", f_note)
 
 
 box = MyOVBox()
