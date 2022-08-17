@@ -19,23 +19,32 @@ from multiprocessing import Process, Value
 
 SYSTEM_RULES = {}  # generator system rules for l-system
 
-notes = [36, 38, 40, 43, 45, 48, 50, 52, 55, 57, 60, 62, 64, 67, 69, 72, 74, 76,
-         79, 81, 84, 86, 88, 91, 93, 96, 98, 100, 103, 105, 108, 110, 112, 115, 117]
+Cmajor_pentatonic = [36, 38, 40, 43, 45, 48, 50, 52, 55, 57, 60, 62, 64, 67, 69, 72, 74, 76,
+                     79, 81, 84, 86, 88, 91, 93, 96, 98, 100, 103, 105, 108, 110, 112, 115, 117]
+
+Fminor_Blues = [41, 44, 46, 47, 48, 51, 53, 56, 58, 59, 60, 63, 68, 70, 71, 72, 75, 77, 80, 82,
+                83, 84, 87, 89, 92, 94, 95, 96, 99, 101, 104, 106, 107, 108, 111, 113, 116, 118, 119, 120]
 
 durations = [2, 4, 8, 16, 32]
 
-velocities = [0, 127, 97, 67]
+velocities = [0, 127, 107, 87]
 
 colors = ['red', 'blue', 'green']
+
+total_iteration = 3
+
+
+def initiate_max(client):
+    client.send_message('initiation', 'bang')
 
 
 def bang_handler(unused_addr, args, volume):
     args[0].value = 1
 
 
-def eeg_handler(unused_addr, args, eeg):
-    args[0].value = eeg
-    print("Alpha Ratio: ", args[0].value)
+# def eeg_handler(unused_addr, args, alpha):
+#     args[0].value = alpha
+#     print("Alpha Ratio: ", args[0].value)
 
 
 def server_func(toggle, eeg):
@@ -51,7 +60,7 @@ def server_func(toggle, eeg):
     global dispatcher
     dispatcher = dispatcher.Dispatcher()
     dispatcher.map("/filter", bang_handler, toggle)
-    dispatcher.map("/eeg", eeg_handler, eeg)
+    # dispatcher.map("/eeg", eeg_handler, eeg)
 
     server = osc_server.ThreadingOSCUDPServer(
         (args.ip, args.port), dispatcher)
@@ -77,17 +86,21 @@ def rule(sequence):
 
 def draw_l_system(turtle, model, seg_length, angle, toggle, client):
     stack = []
+    pitch_stack = []
     midiout = []
-    play = [1, 0, 0]
-    currentDuration = 2
+    play = [1, 0, 0, 0]
+    currentDuration = 1
     currentPitch = 5
     currentVelocity = 1
     currentPlay = 0
+    initialPitch = 0
 
-    for idx in range(0, 3):
+    for idx in range(0, total_iteration):
         i = 0
         client.send_message("record"+str(idx+1), 1)
+        client.send_message("channel", idx)
         client.send_message("play", play)
+        initialPitch = currentPitch
         print("Play loop:", idx)
 
         SYSTEM_RULES = model[idx][-1]
@@ -104,12 +117,9 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
 
                 if i+1 == len(SYSTEM_RULES):
                     print("out of range")
-                    client.send_message("mainplay", 'bang')
-                    client.send_message("loopset", 'bang')
-                    time.sleep(1)
                     break
 
-                elif SYSTEM_RULES[i+1] is not 'F':
+                if SYSTEM_RULES[i+1] is not 'F':
                     currentVelocity = idx+1
                     # print("note on(", duration, ", ", velocity, ")")
 
@@ -117,9 +127,10 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
                     currentVelocity = 0
                     # print("note off(", duration, ", ", velocity, ")")
 
-                midiout = [notes[currentPitch],
+                midiout = [Cmajor_pentatonic[currentPitch],
                            durations[currentDuration], velocities[currentVelocity]]
                 client.send_message("midiout", midiout)
+
                 # print("command[", i, "]: "+SYSTEM_RULES[i] +
                 #       ", command[", i+1, "]: " + SYSTEM_RULES[i+1])
 
@@ -130,19 +141,25 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
                 turtle.forward(seg_length)
             elif command == "+":
                 turtle.right(angle)
-                # max
+
                 currentPitch += 1
-                # max
+                if currentPitch+1 > len(Cmajor_pentatonic):
+                    currentPitch = initialPitch
+
             elif command == "-":
                 turtle.left(angle)
-                # max
+
                 currentPitch -= 1
-                # max
+                if currentPitch < 0:
+                    currentPitch = initialPitch
+
             elif command == "[":
                 stack.append((turtle.position(), turtle.heading()))
+                pitch_stack.append(currentPitch)
             elif command == "]":
                 turtle.pu()  # pen up - not drawing
                 position, heading = stack.pop()
+                currentPitch = pitch_stack.pop()
                 turtle.goto(position)
                 turtle.setheading(heading)
 
@@ -153,9 +170,14 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
         currentDuration += 1
         currentVelocity += 1
         currentPlay += 1
-
         play[currentPlay] = 1
+
+        client.send_message("mainplay", 'bang')
+        client.send_message("loopset", 'bang')
+        time.sleep(1)
         client.send_message("record"+str(idx+1), 0)
+
+    client.send_message("play", play)
     return
 
 
@@ -168,20 +190,42 @@ def set_turtle(alpha_zero):
 
 
 def drawing_macro(toggle, client):
-    rule = "F->F-F+F+FF-F-F+F"
+    # rule = "F->F-F+F+FF-F-F+F"
+    # key, value = rule.split("->")
+    # SYSTEM_RULES[key] = value
+
+    # axiom = "F-F-F-F"
+    # segment_length = 5
+    # alpha_zero = 0.0
+    # angle = 90.0
+
+    # rule = "L->L+R++R-L--LL-R+"
+    # key, value = rule.split("->")
+    # SYSTEM_RULES[key] = value
+    # rule = "R->-L+RR++R+L--L-R"
+    # key, value = rule.split("->")
+    # SYSTEM_RULES[key] = value
+
+    # axiom = "L"
+    # segment_length = 5
+    # alpha_zero = 60.0
+    # angle = 60.0
+
+    rule = "X->F-[[X]+X]+F[+FX]-X"
+    key, value = rule.split("->")
+    SYSTEM_RULES[key] = value
+    rule = "F->FF"
     key, value = rule.split("->")
     SYSTEM_RULES[key] = value
 
-    axiom = "F-F-F-F"
-    model = []
-    for i in range(0, 3):
-        # iterations = 1
-        model.append(derivation(axiom, i+1))
-    # print(model)
-
+    axiom = "X"
     segment_length = 5
     alpha_zero = 90.0
-    angle = 90.0
+    angle = 22.5
+
+    model = []
+    for i in range(0, total_iteration):
+        model.append(derivation(axiom, i+1))
 
     # Set turtle parameters and draw L-System
     r_turtle = set_turtle(alpha_zero)  # create turtle object
@@ -190,8 +234,9 @@ def drawing_macro(toggle, client):
     turtle_screen.bgcolor('black')
     draw_l_system(r_turtle, model,
                   segment_length, angle, toggle, client)  # draw model
-    client.send_message("bang", 'bang')
+    client.send_message("mainplay", 'bang')
     turtle_screen.exitonclick()
+    return
 
 
 def main(toggle):
@@ -205,7 +250,9 @@ def main(toggle):
 
     client = udp_client.SimpleUDPClient(args.ip, args.port)
 
+    initiate_max(client)
     drawing_macro(toggle, client)
+    return
 
 
 if __name__ == "__main__":
