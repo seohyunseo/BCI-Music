@@ -19,11 +19,11 @@ from multiprocessing import Process, Value
 
 SYSTEM_RULES = {}  # generator system rules for l-system
 
-Cmajor_pentatonic = [36, 38, 40, 43, 45, 48, 50, 52, 55, 57, 60, 62, 64, 67, 69, 72, 74, 76,
+Cminor_pentatonic = [36, 38, 40, 43, 45, 48, 50, 52, 55, 57, 60, 62, 64, 67, 69, 72, 74, 76,
                      79, 81, 84, 86, 88, 91, 93, 96, 98, 100, 103, 105, 108, 110, 112, 115, 117]
 
-Fminor_Blues = [41, 44, 46, 47, 48, 51, 53, 56, 58, 59, 60, 63, 68, 70, 71, 72, 75, 77, 80, 82,
-                83, 84, 87, 89, 92, 94, 95, 96, 99, 101, 104, 106, 107, 108, 111, 113, 116, 118, 119, 120]
+Cminor_pentatonic = [36, 39, 41, 43, 46, 48, 51, 53, 55, 58, 60, 63, 65, 67, 70, 72, 75,
+                     77, 79, 82, 84, 87, 89, 91, 94, 96, 99, 101, 103, 106, 108, 111, 113, 115, 118]
 
 durations = [2, 4, 8, 16, 32]
 
@@ -116,10 +116,9 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
                 toggle.value = 0
 
                 if i+1 == len(SYSTEM_RULES):
-                    print("out of range")
                     break
 
-                if SYSTEM_RULES[i+1] is not 'F':
+                elif SYSTEM_RULES[i+1] is not 'F':
                     currentVelocity = idx+1
                     # print("note on(", duration, ", ", velocity, ")")
 
@@ -127,7 +126,7 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
                     currentVelocity = 0
                     # print("note off(", duration, ", ", velocity, ")")
 
-                midiout = [Cmajor_pentatonic[currentPitch],
+                midiout = [Cminor_pentatonic[currentPitch],
                            durations[currentDuration], velocities[currentVelocity]]
                 client.send_message("midiout", midiout)
 
@@ -143,7 +142,7 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
                 turtle.right(angle)
 
                 currentPitch += 1
-                if currentPitch+1 > len(Cmajor_pentatonic):
+                if currentPitch+1 > len(Cminor_pentatonic):
                     currentPitch = initialPitch
 
             elif command == "-":
@@ -199,6 +198,8 @@ def drawing_macro(toggle, client):
     # alpha_zero = 0.0
     # angle = 90.0
 
+    #------------------------------#
+
     # rule = "L->L+R++R-L--LL-R+"
     # key, value = rule.split("->")
     # SYSTEM_RULES[key] = value
@@ -211,6 +212,8 @@ def drawing_macro(toggle, client):
     # alpha_zero = 60.0
     # angle = 60.0
 
+    #------------------------------#
+
     rule = "X->F-[[X]+X]+F[+FX]-X"
     key, value = rule.split("->")
     SYSTEM_RULES[key] = value
@@ -222,6 +225,33 @@ def drawing_macro(toggle, client):
     segment_length = 5
     alpha_zero = 90.0
     angle = 22.5
+
+    #------------------------------#
+
+    # rule = "X->F[+X][-X]FX"
+    # key, value = rule.split("->")
+    # SYSTEM_RULES[key] = value
+    # rule = "F->FF"
+    # key, value = rule.split("->")
+    # SYSTEM_RULES[key] = value
+
+    # axiom = "X"
+    # segment_length = 5
+    # alpha_zero = 90.0
+    # angle = 45.0
+
+    #------------------------------#
+
+    # rule = "F->F+F-F-F+F"
+    # key, value = rule.split("->")
+    # SYSTEM_RULES[key] = value
+
+    # axiom = "-F"
+    # segment_length = 5
+    # alpha_zero = 90.0
+    # angle = 90.0
+
+    #------------------------------#
 
     model = []
     for i in range(0, total_iteration):
