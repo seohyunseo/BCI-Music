@@ -7,8 +7,6 @@ import time
 from pythonosc import udp_client
 
 global epoch
-global meditation
-global electrode
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -29,11 +27,12 @@ class MyOVBox(OVBox):
     def __init__(self):
         OVBox.__init__(self)
         self.signalHeader = None
+        self.idx = 0
+        self.sum = 0.
 
     def process(self):
         # initialize variables
         epoch = 8
-
         for chunkIdx in range(len(self.input[0])):
             if (type(self.input[0][chunkIdx]) == OVSignalHeader):
                 self.signalHeader = self.input[0].pop()
@@ -47,6 +46,11 @@ class MyOVBox(OVBox):
                 list_chunked = list_chunk(chunk, epoch)
                 alpha_ratio = list_chunked[0][0]
                 client.send_message('Alpha', alpha_ratio)
+                self.sum += alpha_ratio
+                if self.idx == 30:
+                    self.sum /= (self.idx+1)
+                    client.send_message("average", self.sum)
+                self.idx += 1
 
             elif(type(self.input[0][chunkIdx]) == OVSignalEnd):
                 print(self.input[0].pop())

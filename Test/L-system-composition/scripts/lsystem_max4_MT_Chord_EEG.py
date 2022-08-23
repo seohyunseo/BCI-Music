@@ -22,8 +22,10 @@ SYSTEM_RULES = {}  # generator system rules for l-system
 Cmajor_pentatonic = [36, 38, 40, 43, 45, 48, 50, 52, 55, 57, 60, 62, 64, 67, 69, 72, 74, 76,
                      79, 81, 84, 86, 88, 91, 93, 96, 98, 100, 103, 105, 108, 110, 112, 115, 117]
 
-Fminor_Blues = [41, 44, 46, 47, 48, 51, 53, 56, 58, 59, 60, 63, 68, 70, 71, 72, 75, 77, 80, 82,
-                83, 84, 87, 89, 92, 94, 95, 96, 99, 101, 104, 106, 107, 108, 111, 113, 116, 118, 119, 120]
+Cminor_pentatonic = [36, 39, 41, 43, 46, 48, 51, 53, 55, 58, 60, 63, 65, 67, 70, 72, 75,
+                     77, 79, 82, 84, 87, 89, 91, 94, 96, 99, 101, 103, 106, 108, 111, 113, 115, 118]
+
+scales = [Cmajor_pentatonic, Cminor_pentatonic]
 
 durations = [2, 4, 8, 16, 32]
 
@@ -32,6 +34,19 @@ velocities = [0, 127, 107, 87]
 colors = ['red', 'blue', 'green']
 
 total_iteration = 3
+
+lsystems = [{'rule_num': 1, 'rule': "F->FF+F-F+F+FF", 'axiom': "F+F+F+F",
+             'segment_length': 5, 'alpha_zero': 0.0, 'angle': 90.0},
+            {'rule_num': 1, 'rule': "F->F-F+F+FF-F-F+F", 'axiom': "F-F-F-F",
+             'segment_length': 5, 'alpha_zero': 0.0, 'angle': 90.0},
+            {'rule_num': 1, 'rule': "F->F+F-F-F+F", 'axiom': "-F",
+             'segment_length': 5, 'alpha_zero': 90.0, 'angle': 90.0},
+            {'rule_num': 2, 'rule': ["L->L+R++R-L--LL-R+", "R->-L+RR++R+L--L-R"], 'axiom': "L",
+             'segment_length': 5, 'alpha_zero': 60.0, 'angle': 60.0},
+            {'rule_num': 2, 'rule': ["X->F-[[X]+X]+F[+FX]-X", "F->FF"], 'axiom': "X",
+             'segment_length': 5, 'alpha_zero': 90.0, 'angle': 22.5},
+            {'rule_num': 2, 'rule': ["X->F[+X][-X]FX", "F->FF"], 'axiom': "X",
+             'segment_length': 5, 'alpha_zero': 90.0, 'angle': 45.0}]
 
 
 def initiate_max(client):
@@ -42,12 +57,18 @@ def bang_handler(unused_addr, args, volume):
     args[0].value = 1
 
 
-# def eeg_handler(unused_addr, args, alpha):
-#     args[0].value = alpha
-#     print("Alpha Ratio: ", args[0].value)
+def scale_handler(unused_addr, args, alpha_average):
+    print("Alpha average: ", alpha_average)
+
+    if alpha_average >= 50.0:
+        args[0].value = 0
+        print("Major Scale selected!")
+    else:
+        args[0].value = 1
+        print("Minor Scale selected!")
 
 
-def server_func(toggle, eeg):
+def server_func(toggle, scale):
     # OSC Server Setting
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip",
@@ -60,7 +81,7 @@ def server_func(toggle, eeg):
     global dispatcher
     dispatcher = dispatcher.Dispatcher()
     dispatcher.map("/filter", bang_handler, toggle)
-    # dispatcher.map("/eeg", eeg_handler, eeg)
+    dispatcher.map("/average", scale_handler, scale)
 
     server = osc_server.ThreadingOSCUDPServer(
         (args.ip, args.port), dispatcher)
@@ -84,7 +105,7 @@ def rule(sequence):
     return sequence
 
 
-def draw_l_system(turtle, model, seg_length, angle, toggle, client):
+def draw_l_system(turtle, model, seg_length, angle, toggle, client, scale):
     stack = []
     pitch_stack = []
     midiout = []
@@ -101,7 +122,7 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
         client.send_message("channel", idx)
         client.send_message("play", play)
         initialPitch = currentPitch
-        print("Play loop:", idx)
+        print("Play loop:", idx+1)
 
         SYSTEM_RULES = model[idx][-1]
         turtle.color(colors[idx])
@@ -111,28 +132,21 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
 
             if command in ["F", "G", "R", "L"]:
                 while toggle.value == 0:
-                    # print("UDP doesn't work")
                     continue
                 toggle.value = 0
 
                 if i+1 == len(SYSTEM_RULES):
-                    print("out of range")
                     break
 
-                if SYSTEM_RULES[i+1] is not 'F':
+                elif SYSTEM_RULES[i+1] is not 'F':
                     currentVelocity = idx+1
-                    # print("note on(", duration, ", ", velocity, ")")
 
                 elif SYSTEM_RULES[i+1] is 'F':
                     currentVelocity = 0
-                    # print("note off(", duration, ", ", velocity, ")")
 
-                midiout = [Cmajor_pentatonic[currentPitch],
+                midiout = [scales[scale.value][currentPitch],
                            durations[currentDuration], velocities[currentVelocity]]
                 client.send_message("midiout", midiout)
-
-                # print("command[", i, "]: "+SYSTEM_RULES[i] +
-                #       ", command[", i+1, "]: " + SYSTEM_RULES[i+1])
 
                 turtle.forward(seg_length)
 
@@ -143,7 +157,7 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
                 turtle.right(angle)
 
                 currentPitch += 1
-                if currentPitch+1 > len(Cmajor_pentatonic):
+                if currentPitch+1 > len(scales[scale.value]):
                     currentPitch = initialPitch
 
             elif command == "-":
@@ -163,7 +177,6 @@ def draw_l_system(turtle, model, seg_length, angle, toggle, client):
                 turtle.goto(position)
                 turtle.setheading(heading)
 
-            # print("command: ", i+1, "/", len(SYSTEM_RULES))
             i += 1
 
         currentPitch += 10
@@ -189,39 +202,24 @@ def set_turtle(alpha_zero):
     return r_turtle
 
 
-def drawing_macro(toggle, client):
-    # rule = "F->F-F+F+FF-F-F+F"
-    # key, value = rule.split("->")
-    # SYSTEM_RULES[key] = value
+def drawing_macro(toggle, client, scale, lsys):
 
-    # axiom = "F-F-F-F"
-    # segment_length = 5
-    # alpha_zero = 0.0
-    # angle = 90.0
+    lsys_idx = lsys - 1
 
-    # rule = "L->L+R++R-L--LL-R+"
-    # key, value = rule.split("->")
-    # SYSTEM_RULES[key] = value
-    # rule = "R->-L+RR++R+L--L-R"
-    # key, value = rule.split("->")
-    # SYSTEM_RULES[key] = value
+    if lsystems[lsys_idx]['rule_num'] > 1:
+        for i in range(0, lsystems[lsys_idx]['rule_num']):
+            rule = lsystems[lsys_idx]['rule'][i]
+            key, value = rule.split("->")
+            SYSTEM_RULES[key] = value
+    else:
+        rule = lsystems[lsys_idx]['rule']
+        key, value = rule.split("->")
+        SYSTEM_RULES[key] = value
 
-    # axiom = "L"
-    # segment_length = 5
-    # alpha_zero = 60.0
-    # angle = 60.0
-
-    rule = "X->F-[[X]+X]+F[+FX]-X"
-    key, value = rule.split("->")
-    SYSTEM_RULES[key] = value
-    rule = "F->FF"
-    key, value = rule.split("->")
-    SYSTEM_RULES[key] = value
-
-    axiom = "X"
-    segment_length = 5
-    alpha_zero = 90.0
-    angle = 22.5
+    axiom = lsystems[lsys_idx]['axiom']
+    segment_length = lsystems[lsys_idx]['segment_length']
+    alpha_zero = lsystems[lsys_idx]['alpha_zero']
+    angle = lsystems[lsys_idx]['angle']
 
     model = []
     for i in range(0, total_iteration):
@@ -233,13 +231,13 @@ def drawing_macro(toggle, client):
     turtle_screen.screensize(1500, 1500)
     turtle_screen.bgcolor('black')
     draw_l_system(r_turtle, model,
-                  segment_length, angle, toggle, client)  # draw model
+                  segment_length, angle, toggle, client, scale)  # draw model
     client.send_message("mainplay", 'bang')
     turtle_screen.exitonclick()
     return
 
 
-def main(toggle):
+def main(toggle, scale, mode, lsys):
     # OSC Client Setting
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", default="127.0.0.1",
@@ -251,17 +249,47 @@ def main(toggle):
     client = udp_client.SimpleUDPClient(args.ip, args.port)
 
     initiate_max(client)
-    drawing_macro(toggle, client)
+
+    drawing_macro(toggle, client, scale, lsys)
     return
 
 
 if __name__ == "__main__":
+    toggle = Value('i', 0)
+    scale = Value('i', 3)
+    p = Process(target=server_func, args=(toggle, scale,))
+    p.start()
+    time.sleep(1)
+
     try:
-        toggle = Value('i', 0)
-        eeg = Value('d', 0.0)
-        p = Process(target=server_func, args=(toggle, eeg,))
-        c = Process(target=main, args=(toggle,))
-        p.start()
+        print("\nWhich mode do you want to play?")
+        print("1. Alpha Feedback mode")
+        print("2. Music only mode")
+
+        mode = input("==> Choose a mode above(1 or 2, q to quit) : ")
+        if mode is "1":
+            print("Please turn the OpenVibe on")
+            while scale.value == 3:
+                time.sleep(1)
+                continue
+        elif mode is "2":
+            print("\nWhich scale do you want to play?")
+            print("1. Major")
+            print("2. Minor")
+            s = input("==> Choose a scale above(1 or 2) : ")
+            if s is "1":
+                scale.value = 0
+            elif s is "2":
+                scale.value = 1
+        elif mode is "q":
+            print("Good Bye!")
+            p.kill()
+            sys.exit(0)
+
+        print("\nWhich lsystem do you want to play?")
+        lsys = int(input("==> Choose from 1 to 6 : "))
+
+        c = Process(target=main, args=(toggle, scale, mode, lsys))
         c.start()
         c.join()
         c.kill()
